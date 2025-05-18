@@ -1,0 +1,59 @@
+### Java ###
+*.class
+*.jar
+*.war
+*.ear
+
+# Compiled class files
+target/
+
+# Logs
+*.log
+
+# Temporary files
+*.tmp
+*.swp
+*.swo
+
+# Built files
+*.iml
+*.hprof
+
+# Maven specific
+.mvn/
+!**/src/main/**/mvn-wrapper.*
+!**/src/main/**/.mvn/wrapper/maven-wrapper.*
+
+# IDEs
+.idea/
+*.iws
+*.ipr
+*.iml
+.vscode/
+.project
+.classpath
+.settings/
+
+# OS specific
+.DS_Store
+Thumbs.db
+
+# Lombok generated files
+lombok.config
+
+# Application properties (if sensitive, like passwords)
+# Uncomment if you're committing different envs separately
+ src/main/resources/application.properties
+ src/main/resources/application.yml
+
+# Node / Frontend (if you're combining with React)
+node_modules/
+dist/
+build/
+.env
+npm-debug.log*
+
+# Misc
+*.bak
+*.orig
+*.rej
