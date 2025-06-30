@@ -1,11 +1,13 @@
 package com.example.panacea.models;
 
 
-import com.example.panacea.enums.Belt;
-import com.example.panacea.enums.Gender;
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-import java.time.DayOfWeek;
-import java.time.Duration;
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -17,44 +19,40 @@ import java.util.List;
  *
  *
  */
-
+@Entity
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@Table(name = "program")
 public class Program {
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
+
     private String name;
     private String description;
-    private float rate; // typing will be fixed in the future
-    private List<DayOfWeek> daysOfWeek;
-    private Duration duration;
-    private List<Integer> ageReq;
-    private List<Gender> genderReq;
-    private List<Belt> beltReq;
-    private int limit;
-    private List<Student> studentsApplied;
+    private BigDecimal rate;
 
-    public Program(
-        long id,
-        String name,
-        String description,
-        float rate,
-        List<DayOfWeek> daysOfWeek,
-        Duration duration,
-        List<Integer> ageReq,
-        List<Gender> genderReq,
-        List<Belt> beltReq,
-        int limit,
-        List<Student> studentsApplied
-    ) {
-        this.id = id;
-        this.name = name;
-        this.description = description;
-        this.rate = rate;
-        this.daysOfWeek = daysOfWeek;
-        this.duration = duration;
-        this.ageReq = ageReq;
-        this.genderReq = genderReq;
-        this.beltReq = beltReq;
-        this.limit = limit;
-        this.studentsApplied = studentsApplied;
-    }
+    // Use a converter or store duration as minutes
+    private long durationMinutes;
 
+    // Serialize lists as comma-separated values
+    private String ageReq;
+    private String genderReq;
+    private String beltReq;
+
+    private int programLimit;
+
+    // Join table required for many-to-many
+    @ManyToMany
+    @JoinTable(
+            name = "program_student",
+            joinColumns = @JoinColumn(name = "program_id"),
+            inverseJoinColumns = @JoinColumn(name = "student_id")
+    )
+    private List<Student> enrolledStudents;
+
+    // Replace list of enums with comma-separated string
+    private String daysOfWeek;
 }

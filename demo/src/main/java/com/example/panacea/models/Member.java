@@ -1,5 +1,13 @@
 package com.example.panacea.models;
 
+import com.example.panacea.enums.Role;
+import jakarta.persistence.*;
+import lombok.*;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
@@ -11,43 +19,65 @@ import java.util.List;
  *
  */
 
-public class Member {
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@Entity
+@Table(name = "member")
+public class Member implements UserDetails {
+
+    @Id
+    @GeneratedValue
     private long id;
     private String name;
     private String lastName;
     private String email;
+    private String password;
     private Date age;
     private String phone;
+    @OneToMany
     private List<Student> students;
     private String address;
     private String city;
     private String postalCode;
     private String History;
 
-    public Member(
-            long id,
-            String name,
-            String lastName,
-            String email,
-            Date age,
-            String phone,
-            List<Student> students,
-            String address,
-            String city,
-            String postalCode,
-            String History) {
-        this.id = id;
-        this.name = name;
-        this.lastName = lastName;
-        this.email = email;
-        this.age = age;
-        this.students = students;
-        this.phone = phone;
-        this.address = address;
-        this.city = city;
-        this.postalCode = postalCode;
-        this.History = History;
+    @Enumerated(EnumType.STRING)
+    private Role role;
 
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return List.of(new SimpleGrantedAuthority(role.name()));
     }
 
+    @Override
+    public String getPassword() {
+        return password;
+    }
+
+    @Override
+    public String getUsername() {
+        return email;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
+    }
 }

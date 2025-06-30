@@ -6,10 +6,11 @@ public enum Belt {
     ORANGE,
     GREEN,
     BLUE,
-    PURPLE_TWO,
-    PURPLE_ONE,
-    BROWN_THREE,
-    BROWN_TWO,
-    BROWN_ONE,
+    PURPLE_II,
+    PURPLE_I,
+    BROWN_III,
+    BROWN_II,
+    BROWN_I,
     BLACK
+
 }
