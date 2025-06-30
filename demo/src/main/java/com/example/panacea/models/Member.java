@@ -1,6 +1,7 @@
 package com.example.panacea.models;
 
 import com.example.panacea.enums.Role;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
@@ -11,14 +12,6 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
-/**
- * Represents a Member that is part of Panacea Karate
- * Academy. The member should be able to register Students
- * into the Academy's Program, remove, or add students at their
- * leisure.
- *
- */
-
 @Data
 @Builder
 @NoArgsConstructor
@@ -28,23 +21,26 @@ import java.util.List;
 public class Member implements UserDetails {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
+
     private String name;
     private String lastName;
     private String email;
     private String password;
-    private Date age;
+    private Date dob;  // Changed from age to dob
     private String phone;
-    @OneToMany
-    private List<Student> students;
     private String address;
     private String city;
     private String postalCode;
-    private String History;
+    private String history;  // Fixed capitalization
 
     @Enumerated(EnumType.STRING)
     private Role role;
+
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonManagedReference
+    private List<Student> students;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -62,22 +58,14 @@ public class Member implements UserDetails {
     }
 
     @Override
-    public boolean isAccountNonExpired() {
-        return true;
-    }
+    public boolean isAccountNonExpired() { return true; }
 
     @Override
-    public boolean isAccountNonLocked() {
-        return true;
-    }
+    public boolean isAccountNonLocked() { return true; }
 
     @Override
-    public boolean isCredentialsNonExpired() {
-        return true;
-    }
+    public boolean isCredentialsNonExpired() { return true; }
 
     @Override
-    public boolean isEnabled() {
-        return true;
-    }
+    public boolean isEnabled() { return true; }
 }

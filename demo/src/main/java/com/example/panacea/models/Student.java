@@ -1,25 +1,13 @@
 package com.example.panacea.models;
 
-
 import com.example.panacea.enums.Belt;
 import com.example.panacea.enums.Gender;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.Date;
 import java.util.List;
-
-
-/**
- * Represents a Student that is registered within Panacea Karate
- * Academy. The Student belt should be promoted with each attended
- * belt exam.
- *
- */
-
 
 @Entity
 @Data
@@ -48,7 +36,11 @@ public class Student {
     @Enumerated(EnumType.STRING)
     private Belt belt;
 
+    @ManyToOne
+    @JoinColumn(name = "member_id")
+    @JsonBackReference
+    private Member member;
+
     @ManyToMany(mappedBy = "enrolledStudents")
     private List<Program> programs;
 }
-
