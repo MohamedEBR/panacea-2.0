@@ -3,17 +3,17 @@
 
 ## ✅ Phase 1: Core CRUD and Validation (Data Integrity First)
 
-- [ ] PUT: Member profile edit (name, address, phone, etc.)
-- [ ] Implement Member status field (ACTIVE/SUSPENDED/CANCELLED/FROZEN)
-- [ ] Auto-suspend members with zero students
-- [ ] Student CRUD: Add/Edit/Withdraw students from a member
+- [X] PUT: Member profile edit (name, address, phone, etc.)
+- [X] Implement Member status field (ACTIVE/SUSPENDED/CANCELLED/FROZEN)
+- [X] Auto-suspend members with zero students
+- [X] Student CRUD: Add/Edit/Withdraw students from a member
 - [ ] Enforce max 5 programs per student
-- [ ] Add `yearsInClub` field to Student model
+- [X] Add `yearsInClub` field to Student model
 - [ ] Validate student belt, age, and experience for program enrollment
 - [ ] Enforce program space limits (NoProgramSpaceException)
-- [ ] Implement missing custom exceptions (MemberNotFoundException, StudentNotFoundException, etc.)
+- [X] Implement missing custom exceptions (MemberNotFoundException, StudentNotFoundException, etc.)
 - [ ] Global exception handling improvements
-- [ ] Add @Transactional where needed
+- [X] Add @Transactional where needed
 
 ## ✅ Phase 2: Stripe Integration and Billing Logic
 

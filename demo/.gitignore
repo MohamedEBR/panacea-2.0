@@ -51,9 +51,13 @@ node_modules/
 dist/
 build/
 .env
-npm-debug.log*
+npm-debug.log*Roadmap.md
+
 
 # Misc
 *.bak
 *.orig
 *.rej
+
+RoadMap.md
+

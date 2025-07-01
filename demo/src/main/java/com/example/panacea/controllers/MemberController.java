@@ -7,6 +7,7 @@ import com.example.panacea.dto.UpdatePaymentMethodRequest;
 import com.example.panacea.models.Member;
 import com.example.panacea.models.Student;
 import com.example.panacea.services.MemberService;
+import com.stripe.exception.StripeException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -69,7 +70,7 @@ public class MemberController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> cancelMembership(@PathVariable Long id) {
+    public ResponseEntity<String> cancelMembership(@PathVariable Long id) throws StripeException {
         service.cancelMembership(id);
         return ResponseEntity.ok("Membership cancelled successfully");
     }

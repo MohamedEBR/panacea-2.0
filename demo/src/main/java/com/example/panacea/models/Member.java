@@ -1,5 +1,6 @@
 package com.example.panacea.models;
 
+import com.example.panacea.enums.MemberStatus;
 import com.example.panacea.enums.Role;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
@@ -34,6 +35,10 @@ public class Member implements UserDetails {
     private String city;
     private String postalCode;
     private String history;  // Fixed capitalization
+    private MemberStatus status;
+
+    @Column(name = "stripe_customer_id")
+    private String stripeCustomerId;
 
     @Enumerated(EnumType.STRING)
     private Role role;

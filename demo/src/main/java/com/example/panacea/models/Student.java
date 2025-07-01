@@ -36,6 +36,8 @@ public class Student {
     @Enumerated(EnumType.STRING)
     private Belt belt;
 
+    private int yearsInClub;
+
     @ManyToOne
     @JoinColumn(name = "member_id")
     @JsonBackReference

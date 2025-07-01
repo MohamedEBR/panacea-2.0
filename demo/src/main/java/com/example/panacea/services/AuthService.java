@@ -9,11 +9,13 @@ import com.example.panacea.enums.Role;
 import com.example.panacea.exceptions.DuplicateStudentException;
 import com.example.panacea.exceptions.EmailAlreadyExistsException;
 import com.example.panacea.exceptions.ProgramNotFoundException;
+import com.example.panacea.exceptions.StripeIntegrationException;
 import com.example.panacea.models.Member;
 import com.example.panacea.models.Program;
 import com.example.panacea.models.Student;
 import com.example.panacea.repo.MemberRepository;
 import com.example.panacea.repo.ProgramRepository;
+import com.stripe.exception.StripeException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -23,6 +25,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.sql.Date;
+import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -37,9 +40,10 @@ public class AuthService {
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
     private final ProgramRepository programRepository;
+    private final StripeService stripeService;
 
     @Transactional
-    public AuthenticationResponse register(RegisterRequest request) {
+    public AuthenticationResponse register(RegisterRequest request) throws StripeException {
 
         if (memberRepository.findByEmail(request.getEmail()).isPresent()) {
             throw new EmailAlreadyExistsException("Email already registered: " + request.getEmail());
@@ -117,6 +121,18 @@ public class AuthService {
                 .students(students)
                 .build();
 
+        String stripeCustomerId;
+        try {
+            stripeCustomerId = stripeService.createCustomer(
+                    request.getName() + " " + request.getLastName(),
+                    request.getEmail()
+            );
+        } catch (StripeException e) {
+            throw new StripeIntegrationException("Stripe customer creation failed: " + e.getMessage());
+        }
+
+// 2. Set the Stripe customer ID in Member
+        member.setStripeCustomerId(stripeCustomerId);
         students.forEach(student -> student.setMember(member));
 
         memberRepository.save(member);
