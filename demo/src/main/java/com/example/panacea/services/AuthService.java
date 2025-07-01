@@ -1,8 +1,8 @@
 package com.example.panacea.services;
 
-import com.example.panacea.controllers.AuthenticationRequest;
-import com.example.panacea.controllers.AuthenticationResponse;
-import com.example.panacea.controllers.RegisterRequest;
+import com.example.panacea.dto.AuthenticationRequest;
+import com.example.panacea.dto.AuthenticationResponse;
+import com.example.panacea.dto.RegisterRequest;
 import com.example.panacea.enums.Belt;
 import com.example.panacea.enums.Gender;
 import com.example.panacea.enums.Role;

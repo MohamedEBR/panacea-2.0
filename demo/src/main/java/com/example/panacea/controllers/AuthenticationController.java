@@ -1,5 +1,8 @@
 package com.example.panacea.controllers;
 
+import com.example.panacea.dto.AuthenticationRequest;
+import com.example.panacea.dto.AuthenticationResponse;
+import com.example.panacea.dto.RegisterRequest;
 import com.example.panacea.services.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

@@ -1,4 +1,4 @@
-package com.example.panacea.controllers;
+package com.example.panacea.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
