@@ -6,10 +6,7 @@ import com.example.panacea.dto.RegisterRequest;
 import com.example.panacea.enums.Belt;
 import com.example.panacea.enums.Gender;
 import com.example.panacea.enums.Role;
-import com.example.panacea.exceptions.DuplicateStudentException;
-import com.example.panacea.exceptions.EmailAlreadyExistsException;
-import com.example.panacea.exceptions.ProgramNotFoundException;
-import com.example.panacea.exceptions.StripeIntegrationException;
+import com.example.panacea.exceptions.*;
 import com.example.panacea.models.Member;
 import com.example.panacea.models.Program;
 import com.example.panacea.models.Student;
@@ -94,6 +91,10 @@ public class AuthService {
                 throw new IllegalArgumentException("Invalid belt: " + s.getBelt() + ". Allowed belts: WHITE, YELLOW, etc.");
             }
 
+            if (s.getProgramIds().size() > 5) {
+                throw new TooManyProgramsException("Student " + s.getName() + " cannot be enrolled in more than 5 programs.");
+            }
+
             return Student.builder()
                     .name(s.getName())
                     .dob(Date.valueOf(s.getDob()))
@@ -131,7 +132,6 @@ public class AuthService {
             throw new StripeIntegrationException("Stripe customer creation failed: " + e.getMessage());
         }
 
-// 2. Set the Stripe customer ID in Member
         member.setStripeCustomerId(stripeCustomerId);
         students.forEach(student -> student.setMember(member));
 

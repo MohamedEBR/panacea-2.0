@@ -90,6 +90,10 @@ public class MemberService {
                 throw new ProgramNotFoundException("One or more program IDs are invalid for student: " + s.getName());
             }
 
+            if (s.getProgramIds().size() > 5) {
+                throw new TooManyProgramsException("Student " + s.getName() + " cannot be enrolled in more than 5 programs.");
+            }
+
             Student student = new Student();
             student.setName(s.getName());
             student.setDob(Date.valueOf(s.getDob()));
@@ -101,6 +105,8 @@ public class MemberService {
             student.setYearsInClub(s.getYearsInClub());
             student.setPrograms(programs);
             student.setMember(member);
+
+
 
             return student;
         }).toList();
