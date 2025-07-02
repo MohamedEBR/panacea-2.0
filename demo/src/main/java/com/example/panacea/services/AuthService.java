@@ -97,13 +97,14 @@ public class AuthService {
 
             return Student.builder()
                     .name(s.getName())
-                    .dob(Date.valueOf(s.getDob()))
+                    .dob(Date.valueOf(s.getDob()).toLocalDate())
                     .weight(s.getWeight())
                     .height(s.getHeight())
                     .medicalConcerns(s.getMedicalConcerns())
                     .gender(gender)
                     .belt(belt)
                     .programs(studentPrograms)
+                    .registeredAt(LocalDate.now())
                     .build();
         }).collect(Collectors.toList());
 

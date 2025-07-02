@@ -38,11 +38,11 @@ public class Program {
     private long durationMinutes;
 
     // Serialize lists as comma-separated values
-    private String ageReq;
+    private String minAge;
     private String genderReq;
-    private String beltReq;
-
-    private int programLimit;
+    private String minBelt;
+    private int minYearsInClub;
+    private int capacity;
 
     // Join table required for many-to-many
     @ManyToMany

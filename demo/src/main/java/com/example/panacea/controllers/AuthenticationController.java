@@ -4,6 +4,7 @@ import com.example.panacea.dto.AuthenticationRequest;
 import com.example.panacea.dto.AuthenticationResponse;
 import com.example.panacea.dto.RegisterRequest;
 import com.example.panacea.services.AuthService;
+import com.stripe.exception.StripeException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -22,7 +23,7 @@ public class AuthenticationController {
     @PostMapping("/register")
     public ResponseEntity<AuthenticationResponse> register(
             @Valid @RequestBody RegisterRequest request
-    ) {
+    ) throws StripeException {
         return ResponseEntity.ok(service.register(request));
     }
 

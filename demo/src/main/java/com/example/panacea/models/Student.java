@@ -6,6 +6,8 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDate;
+import java.time.Period;
 import java.util.Date;
 import java.util.List;
 
@@ -24,7 +26,7 @@ public class Student {
     private String name;
 
     @Temporal(TemporalType.DATE)
-    private Date dob;
+    private LocalDate dob;
 
     private int weight;
     private int height;
@@ -36,6 +38,7 @@ public class Student {
     @Enumerated(EnumType.STRING)
     private Belt belt;
 
+    private LocalDate registeredAt;
     private int yearsInClub;
 
     @ManyToOne
@@ -45,4 +48,10 @@ public class Student {
 
     @ManyToMany(mappedBy = "enrolledStudents")
     private List<Program> programs;
+
+    public int getYearsInClub() {
+        if (registeredAt == null) return 0;
+        return Period.between(registeredAt, LocalDate.now()).getYears();
+    }
+
 }

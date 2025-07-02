@@ -96,7 +96,7 @@ public class MemberService {
 
             Student student = new Student();
             student.setName(s.getName());
-            student.setDob(Date.valueOf(s.getDob()));
+            student.setDob(s.getDob());
             student.setWeight(s.getWeight());
             student.setHeight(s.getHeight());
             student.setMedicalConcerns(s.getMedicalConcerns());
@@ -144,5 +144,27 @@ public class MemberService {
         stripeService.cancelCustomerSubscription(member.getStripeCustomerId());
 
     }
+
+    public void updateMemberStatus(Member member) {
+        if (member == null) return;
+
+        boolean hasStudents = member.getStudents() != null && !member.getStudents().isEmpty();
+
+        switch (member.getStatus()) {
+            case ACTIVE -> {
+                if (!hasStudents) {
+                    member.setStatus(MemberStatus.SUSPENDED);
+                }
+            }
+            case SUSPENDED -> {
+                if (hasStudents) {
+                    member.setStatus(MemberStatus.ACTIVE);
+                }
+            }
+        }
+
+        memberRepository.save(member);
+    }
+
 
 }
