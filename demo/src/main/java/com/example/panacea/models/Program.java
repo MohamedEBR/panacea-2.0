@@ -1,6 +1,8 @@
 package com.example.panacea.models;
 
 
+import com.example.panacea.enums.Belt;
+import com.example.panacea.enums.Gender;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -34,13 +36,14 @@ public class Program {
     private String description;
     private BigDecimal rate;
 
-    // Use a converter or store duration as minutes
     private long durationMinutes;
 
-    // Serialize lists as comma-separated values
-    private String minAge;
-    private String genderReq;
-    private String minBelt;
+    private Gender genderReq;
+
+
+    private int minAge;
+    @Enumerated(EnumType.STRING)
+    private Belt minBelt;
     private int minYearsInClub;
     private int capacity;
 

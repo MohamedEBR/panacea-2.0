@@ -1,10 +1,12 @@
 package com.example.panacea.services;
 
 import com.example.panacea.exceptions.StripeIntegrationException;
+import com.example.panacea.models.Member;
 import com.stripe.Stripe;
 import com.stripe.exception.StripeException;
 import com.stripe.model.Customer;
 import com.stripe.model.Subscription;
+import com.stripe.param.CustomerCreateParams;
 import com.stripe.param.SubscriptionListParams;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -19,13 +21,19 @@ public class StripeService {
         Stripe.apiKey = apiKey;
     }
 
-    public String createCustomer(String name, String email) throws StripeException {
-        Map<String, Object> params = new HashMap<>();
-        params.put("name", name);
-        params.put("email", email);
+    public String createCustomer(Member member) {
+        CustomerCreateParams params = CustomerCreateParams.builder()
+                .setEmail(member.getEmail())
+                .setName(member.getName() + " " + member.getLastName())
+                .setPhone(member.getPhone())
+                .build();
 
-        Customer customer = Customer.create(params);
-        return customer.getId();
+        try {
+            Customer customer = Customer.create(params);
+            return customer.getId();
+        } catch (StripeException e) {
+            throw new RuntimeException("Stripe error: " + e.getMessage());
+        }
     }
 
     public void attachPaymentMethodToCustomer(String stripeCustomerId, String paymentMethodId) throws StripeException {

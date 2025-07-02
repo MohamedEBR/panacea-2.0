@@ -9,6 +9,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.time.LocalDate;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -29,7 +30,7 @@ public class Member implements UserDetails {
     private String lastName;
     private String email;
     private String password;
-    private Date dob;  // Changed from age to dob
+    private LocalDate dob;  // Changed from age to dob
     private String phone;
     private String address;
     private String city;
