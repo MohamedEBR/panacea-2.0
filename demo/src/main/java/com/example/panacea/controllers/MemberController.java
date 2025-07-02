@@ -33,6 +33,7 @@ public class MemberController {
         return ResponseEntity.ok(students);
     }
 
+
     @PutMapping("/{id}/info")
     public ResponseEntity<String> updateMemberInfo(
             @PathVariable Long id,

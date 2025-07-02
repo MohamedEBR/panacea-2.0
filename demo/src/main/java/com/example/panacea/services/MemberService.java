@@ -106,8 +106,6 @@ public class MemberService {
             student.setPrograms(programs);
             student.setMember(member);
 
-
-
             return student;
         }).toList();
 

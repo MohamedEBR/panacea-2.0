@@ -7,13 +7,16 @@ import com.example.panacea.enums.Belt;
 import com.example.panacea.exceptions.*;
 import com.example.panacea.models.Program;
 import com.example.panacea.models.Student;
+import com.example.panacea.models.StudentProgramHistory;
 import com.example.panacea.repo.ProgramRepository;
+import com.example.panacea.repo.StudentProgramHistoryRepository;
 import com.example.panacea.repo.StudentRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.Period;
 
 @Service
@@ -23,7 +26,7 @@ public class StudentService {
     private final StudentRepository studentRepository;
     private final ProgramRepository programRepository;
     private final MemberService memberService;
-
+    private final StudentProgramHistoryRepository historyRepository;
     public Student getStudentById(Long id) {
         return studentRepository.findById(id)
                 .orElseThrow(() -> new StudentNotFoundException("Student not found with id: " + id));
@@ -85,6 +88,14 @@ public class StudentService {
             }
         }
 
+        historyRepository.save(StudentProgramHistory.builder()
+                .student(student)
+                .program(program)
+                .action(StudentProgramHistory.ActionType.ENROLLED)
+                .timestamp(LocalDateTime.now())
+                .build());
+
+
         student.getPrograms().add(program);
         studentRepository.save(student);
     }
@@ -99,8 +110,17 @@ public class StudentService {
             throw new StudentNotEnrolledException("Student is not enrolled in this program.");
         }
 
+        historyRepository.save(StudentProgramHistory.builder()
+                .student(student)
+                .program(program)
+                .action(StudentProgramHistory.ActionType.WITHDRAWN)
+                .timestamp(LocalDateTime.now())
+                .build());
+
+
         student.getPrograms().remove(program);
         studentRepository.save(student);
+
 
         memberService.updateMemberStatus(student.getMember());
     }

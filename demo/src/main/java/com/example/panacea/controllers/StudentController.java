@@ -3,10 +3,14 @@ package com.example.panacea.controllers;
 import com.example.panacea.dto.AddStudentProgramRequest;
 import com.example.panacea.dto.UpdateStudentInfoRequest;
 import com.example.panacea.dto.WithdrawStudentProgramRequest;
+import com.example.panacea.models.StudentProgramHistory;
+import com.example.panacea.repo.StudentProgramHistoryRepository;
 import com.example.panacea.services.StudentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/students")
@@ -14,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 public class StudentController {
 
     private final StudentService service;
+    private final StudentProgramHistoryRepository historyRepository;
 
 
     @GetMapping("/{id}")
@@ -44,4 +49,10 @@ public class StudentController {
         service.deleteStudent(id);
         return ResponseEntity.ok("Student withdrawn successfully");
     }
+
+    @GetMapping("/{id}/history")
+    public ResponseEntity<List<StudentProgramHistory>> getStudentHistory(@PathVariable Long id) {
+        return ResponseEntity.ok(historyRepository.findByStudentId(id));
+    }
+
 }
