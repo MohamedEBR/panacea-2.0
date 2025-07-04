@@ -7,7 +7,6 @@ import com.example.panacea.dto.UpdatePaymentMethodRequest;
 import com.example.panacea.models.Member;
 import com.example.panacea.models.Student;
 import com.example.panacea.services.MemberService;
-import com.stripe.exception.StripeException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -33,6 +32,18 @@ public class MemberController {
         return ResponseEntity.ok(students);
     }
 
+
+    @PutMapping("/{id}/freeze")
+    public ResponseEntity<Void> freeze(@PathVariable Long id) {
+        service.freezeMember(id);
+        return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("/{id}/unfreeze")
+    public ResponseEntity<Void> unfreeze(@PathVariable Long id) {
+        service.unfreezeMember(id);
+        return ResponseEntity.ok().build();
+    }
 
     @PutMapping("/{id}/info")
     public ResponseEntity<String> updateMemberInfo(
@@ -71,7 +82,7 @@ public class MemberController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> cancelMembership(@PathVariable Long id) throws StripeException {
+    public ResponseEntity<String> cancelMembership(@PathVariable Long id) {
         service.cancelMembership(id);
         return ResponseEntity.ok("Membership cancelled successfully");
     }

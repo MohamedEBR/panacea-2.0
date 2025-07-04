@@ -14,13 +14,12 @@ import com.example.panacea.models.Student;
 import com.example.panacea.repo.MemberRepository;
 import com.example.panacea.repo.ProgramRepository;
 import com.example.panacea.repo.StudentRepository;
-import com.stripe.exception.StripeException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.sql.Date;
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -32,6 +31,7 @@ public class MemberService {
     private final ProgramRepository programRepository;
     private final StudentRepository studentRepository;
     private final StripeService stripeService;
+    private final BillingService billingService;
 
     public Member getMemberById(long id) {
         return memberRepository.findById(id)
@@ -43,6 +43,29 @@ public class MemberService {
                 .orElseThrow(() -> new MemberNotFoundException("Member not found with id: " + memberId));
 
         return member.getStudents();
+    }
+
+    @Transactional
+    public void freezeMember(Long id) {
+        Member member = getMemberById(id);
+        member.setStatus(MemberStatus.FROZEN);
+        memberRepository.save(member);
+    }
+
+    @Transactional
+    public void unfreezeMember(Long id) {
+        Member member = getMemberById(id);
+        MemberStatus previous = member.getStatus();
+        member.setStatus(MemberStatus.ACTIVE);
+        memberRepository.save(member);
+
+        // If reactivated within first 10 days, bill immediately
+        if (previous == MemberStatus.FROZEN) {
+            int day = LocalDate.now().getDayOfMonth();
+            if (day <= 10) {
+                billingService.billMember(member);
+            }
+        }
     }
 
     public void updateMemberInfo(long id, UpdateMemberInfoRequest request) {
@@ -121,18 +144,14 @@ public class MemberService {
 
         String stripeCustomerId = member.getStripeCustomerId();
         if (stripeCustomerId == null || stripeCustomerId.isBlank()) {
-            throw new StripeIntegrationException("No Stripe customer ID found for member. Cannot update payment method.");
+            throw new StripeIntegrationException("No Stripe customer ID found for member. Cannot update payment method.", new Exception());
         }
 
-        try {
-            stripeService.attachPaymentMethodToCustomer(stripeCustomerId, request.getPaymentMethodId());
-        } catch (StripeException e) {
-            throw new StripeIntegrationException("Stripe payment method update failed: " + e.getMessage());
-        }
+        stripeService.attachPaymentMethodToCustomer(stripeCustomerId, request.getPaymentMethodId());
     }
 
     @Transactional
-    public void cancelMembership(long id) throws StripeException {
+    public void cancelMembership(long id) {
         Member member = memberRepository.findById(id)
                 .orElseThrow(() -> new MemberNotFoundException("Member not found with id: " + id));
 
@@ -144,20 +163,22 @@ public class MemberService {
     }
 
     public void updateMemberStatus(Member member) {
-        if (member == null) return;
-
+        MemberStatus previous = member.getStatus();
         boolean hasStudents = member.getStudents() != null && !member.getStudents().isEmpty();
 
-        switch (member.getStatus()) {
-            case ACTIVE -> {
-                if (!hasStudents) {
-                    member.setStatus(MemberStatus.SUSPENDED);
-                }
-            }
-            case SUSPENDED -> {
-                if (hasStudents) {
-                    member.setStatus(MemberStatus.ACTIVE);
-                }
+        if (hasStudents && previous == MemberStatus.SUSPENDED) {
+            member.setStatus(MemberStatus.ACTIVE);
+        } else if (!hasStudents && previous == MemberStatus.ACTIVE) {
+            member.setStatus(MemberStatus.SUSPENDED);
+        }
+        // handle FROZEN → ACTIVE transition
+        else if (previous == MemberStatus.FROZEN && hasStudents) {
+            member.setStatus(MemberStatus.ACTIVE);
+
+            int dayOfMonth = LocalDate.now().getDayOfMonth();
+            if (dayOfMonth <= 10) {
+                // immediately bill this member
+                billingService.billMember(member);
             }
         }
 

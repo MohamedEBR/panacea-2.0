@@ -2,14 +2,16 @@ package com.example.panacea.models;
 
 import com.example.panacea.enums.Belt;
 import com.example.panacea.enums.Gender;
+import com.example.panacea.enums.StudentStatus;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
 import java.time.Period;
-import java.util.Date;
 import java.util.List;
+
+import static com.example.panacea.enums.StudentStatus.ACTIVE;
 
 @Entity
 @Data
@@ -38,6 +40,9 @@ public class Student {
     @Enumerated(EnumType.STRING)
     private Belt belt;
 
+    @Enumerated(EnumType.STRING)
+    private StudentStatus status;
+
     private LocalDate registeredAt;
     private int yearsInClub;
 
@@ -52,6 +57,10 @@ public class Student {
     public int getYearsInClub() {
         if (registeredAt == null) return 0;
         return Period.between(registeredAt, LocalDate.now()).getYears();
+    }
+
+    public boolean isActive(){
+        return status == ACTIVE;
     }
 
 }
