@@ -7,10 +7,10 @@
 - [X] Implement Member status field (ACTIVE/SUSPENDED/CANCELLED/FROZEN)
 - [X] Auto-suspend members with zero students
 - [X] Student CRUD: Add/Edit/Withdraw students from a member
-- [ ] Enforce max 5 programs per student
+- [X] Enforce max 5 programs per student
 - [X] Add `yearsInClub` field to Student model
-- [ ] Validate student belt, age, and experience for program enrollment
-- [ ] Enforce program space limits (NoProgramSpaceException)
+- [X] Validate student belt, age, and experience for program enrollment
+- [X] Enforce program space limits (NoProgramSpaceException)
 - [X] Implement missing custom exceptions (MemberNotFoundException, StudentNotFoundException, etc.)
 - [ ] Global exception handling improvements
 - [X] Add @Transactional where needed

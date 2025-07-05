@@ -23,7 +23,11 @@ public class SecurityConfiguration {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
+                        // Public auth endpoints
                         .requestMatchers("/api/v1/auth/**").permitAll()
+                        // Admin-only billing trigger and other admin APIs
+                        .requestMatchers("/api/v1/admin/**").hasRole("SUPER_USER")
+                        // Everything else requires authentication
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session

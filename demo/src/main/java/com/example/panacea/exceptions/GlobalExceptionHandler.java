@@ -1,65 +1,90 @@
 package com.example.panacea.exceptions;
 
+import jakarta.validation.ConstraintViolationException;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
-import java.time.LocalDateTime;
-import java.util.List;
+import java.util.HashMap;
 import java.util.Map;
-import java.util.stream.Collectors;
 
-@RestControllerAdvice
-public class GlobalExceptionHandler {
+@ControllerAdvice
+public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
-    @ExceptionHandler(ProgramNotFoundException.class)
-    public ResponseEntity<?> handleProgramNotFound(ProgramNotFoundException ex) {
-        return errorResponse(HttpStatus.BAD_REQUEST, "Program Not Found", ex.getMessage());
+    // Handle entity not found exceptions
+    @ExceptionHandler({MemberNotFoundException.class, StudentNotFoundException.class, ProgramNotFoundException.class})
+    protected ResponseEntity<Object> handleNotFound(RuntimeException ex) {
+        ApiError error = new ApiError(HttpStatus.NOT_FOUND, ex.getMessage());
+        return buildResponseEntity(error);
     }
 
-    @ExceptionHandler(EmailAlreadyExistsException.class)
-    public ResponseEntity<?> handleEmailAlreadyExists(EmailAlreadyExistsException ex) {
-        return errorResponse(HttpStatus.BAD_REQUEST, "Email Already Exists", ex.getMessage());
+    // Handle bad request exceptions
+    @ExceptionHandler({DuplicateEmailException.class, DuplicateStudentException.class,
+            NoProgramSpaceException.class, TooManyProgramsException.class,
+            ProgramRequirementNotMetException.class, InvalidTokenException.class,
+            PasswordMismatchException.class, StripeIntegrationException.class})
+    protected ResponseEntity<Object> handleBadRequest(RuntimeException ex) {
+        ApiError error = new ApiError(HttpStatus.BAD_REQUEST, ex.getMessage());
+        return buildResponseEntity(error);
+    }
+    @Override
+    protected ResponseEntity<Object> handleMethodArgumentNotValid(
+            MethodArgumentNotValidException ex,
+            HttpHeaders headers,
+            org.springframework.http.HttpStatusCode status,   // ← HttpStatusCode instead
+            WebRequest request) {
+
+        Map<String, String> fieldErrors = new HashMap<>();
+        ex.getBindingResult().getAllErrors().forEach(err -> {
+            String field = ((FieldError) err).getField();
+            String message = err.getDefaultMessage();
+            fieldErrors.put(field, message);
+        });
+        ApiError error = new ApiError(HttpStatus.BAD_REQUEST, "Validation failed", fieldErrors);
+        return buildResponseEntity(error);
     }
 
-    @ExceptionHandler(DuplicateStudentException.class)
-    public ResponseEntity<?> handleDuplicateStudent(DuplicateStudentException ex) {
-        return errorResponse(HttpStatus.BAD_REQUEST, "Duplicate Student", ex.getMessage());
+    // Handle constraint violations
+    @ExceptionHandler(ConstraintViolationException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    protected ResponseEntity<Object> handleConstraintViolation(ConstraintViolationException ex) {
+        ApiError error = new ApiError(HttpStatus.BAD_REQUEST, ex.getMessage());
+        return buildResponseEntity(error);
     }
 
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<?> handleValidationErrors(MethodArgumentNotValidException ex) {
-        List<String> errors = ex.getBindingResult()
-                .getFieldErrors()
-                .stream()
-                .map(err -> err.getField() + ": " + err.getDefaultMessage())
-                .collect(Collectors.toList());
-
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
-                Map.of(
-                        "timestamp", LocalDateTime.now(),
-                        "status", HttpStatus.BAD_REQUEST.value(),
-                        "error", "Validation Error",
-                        "messages", errors
-                )
-        );
+    // Fallback for all other exceptions
+    @ExceptionHandler(Exception.class)
+    protected ResponseEntity<Object> handleAll(Exception ex) {
+        ApiError error = new ApiError(HttpStatus.INTERNAL_SERVER_ERROR, "An unexpected error occurred");
+        return buildResponseEntity(error);
     }
 
-    @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<?> handleIllegalArgument(IllegalArgumentException ex) {
-        return errorResponse(HttpStatus.BAD_REQUEST, "Invalid Input", ex.getMessage());
+    private ResponseEntity<Object> buildResponseEntity(ApiError apiError) {
+        return new ResponseEntity<>(apiError, apiError.getStatus());
     }
 
-    private ResponseEntity<?> errorResponse(HttpStatus status, String error, String message) {
-        return ResponseEntity.status(status).body(
-                Map.of(
-                        "timestamp", LocalDateTime.now(),
-                        "status", status.value(),
-                        "error", error,
-                        "message", message
-                )
-        );
+    // Inner class for API error structure
+    @Getter
+    @Setter
+    @AllArgsConstructor
+    private static class ApiError {
+        private HttpStatus status;
+        private String message;
+        private Object errors;
+
+        public ApiError(HttpStatus status, String message) {
+            this.status = status;
+            this.message = message;
+        }
     }
 }
