@@ -12,29 +12,29 @@
 - [X] Validate student belt, age, and experience for program enrollment
 - [X] Enforce program space limits (NoProgramSpaceException)
 - [X] Implement missing custom exceptions (MemberNotFoundException, StudentNotFoundException, etc.)
-- [ ] Global exception handling improvements
+- [X] Global exception handling improvements
 - [X] Add @Transactional where needed
 
 ## ✅ Phase 2: Stripe Integration and Billing Logic
 
-- [ ] Integrate Stripe API for customer creation and payment
-- [ ] Save Stripe customer ID in Member entity
-- [ ] Monthly billing scheduler (runs 1st of each month)
-- [ ] Calculate charges based on student program enrollments
-- [ ] Charge members via Stripe
-- [ ] Store receipts in billingHistory
+- [X] Integrate Stripe API for customer creation and payment
+- [X] Save Stripe customer ID in Member entity
+- [X] Monthly billing scheduler (runs 1st of each month)
+- [X] Calculate charges based on student program enrollments
+- [X] Charge members via Stripe
+- [X] Store receipts in billingHistory
 - [ ] Email payment receipts
-- [ ] Allow members to update payment methods (Stripe)
+- [X] Allow members to update payment methods (Stripe)
 - [ ] Enforce future-effective program changes (affect next month only)
-- [ ] Implement Freeze/Unfreeze logic with billing rules
+- [X] Implement Freeze/Unfreeze logic with billing rules
 
 ## ✅ Phase 3: Password and Security Flow
 
-- [ ] PUT: Member change password (authenticated)
-- [ ] POST: Forgot Password → generate reset token
-- [ ] POST: Reset Password (token-based)
-- [ ] Email password reset links
-- [ ] Handle token expiry and invalidation (InvalidTokenException)
+- [X] PUT: Member change password (authenticated)
+- [X] POST: Forgot Password → generate reset token
+- [X] POST: Reset Password (token-based)
+- [X] Email password reset links
+- [X] Handle token expiry and invalidation (InvalidTokenException)
 
 ## ✅ Phase 4: Super User Admin Panel Features
 

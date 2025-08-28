@@ -32,13 +32,13 @@ public class StudentController {
         return ResponseEntity.ok("Student info updated successfully");
     }
 
-    @PutMapping("/{id}/programs")
+    @PutMapping(value = "/{id}/programs", params = "add")
     public ResponseEntity<String> addStudentProgram(@PathVariable Long id, @RequestBody AddStudentProgramRequest request) {
         service.addStudentProgram(id, request);
         return ResponseEntity.ok("Student program added successfully");
     }
 
-    @PutMapping("/{id}/programs")
+    @PutMapping(value = "/{id}/programs", params = "withdraw")
     public ResponseEntity<String> withdrawStudentProgram(@PathVariable Long id, @RequestBody WithdrawStudentProgramRequest request) {
         service.withdrawStudentProgram(id, request);
         return ResponseEntity.ok("Student program withdrawn successfully");

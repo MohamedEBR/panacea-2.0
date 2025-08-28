@@ -64,36 +64,34 @@ public class StudentService {
         }
 
         int age = Period.between(student.getDob(), LocalDate.now()).getYears();
-        if (program.getMinAge() != null && !program.getMinAge().isBlank()) {
-            int minAge = Integer.parseInt(program.getMinAge());
-            if (age < minAge) {
-                throw new ProgramRequirementNotMetException("Student does not meet the minimum age requirement.");
-            }
+        if (age < program.getMinAge()) {
+            throw new ProgramRequirementNotMetException("Student does not meet the minimum age requirement.");
         }
 
-        if (program.getMinBelt() != null && !program.getMinBelt().isBlank()) {
-            Belt requiredBelt = Belt.valueOf(program.getMinBelt().toUpperCase());
-            if (student.getBelt().getRank() < requiredBelt.getRank()) {
-                throw new ProgramRequirementNotMetException("Student's belt is too low for this program.");
-            }
+        Belt requiredBelt = program.getMinBelt();
+        if (student.getBelt() != null && (student.getBelt().getRank() < requiredBelt.getRank())) {
+            throw new ProgramRequirementNotMetException("Student's belt is too low for this program.");
         }
+
 
         if (student.getYearsInClub() < program.getMinYearsInClub()) {
             throw new ProgramRequirementNotMetException("Student does not meet the experience requirement.");
         }
 
-        if (program.getGenderReq() != null && !program.getGenderReq().isBlank()) {
-            if (!program.getGenderReq().equalsIgnoreCase(String.valueOf(student.getGender()))) {
+        if (program.getGenderReq() != null) {
+            if (program.getGenderReq() != student.getGender()) {
                 throw new ProgramRequirementNotMetException("Student does not meet the gender requirement.");
             }
         }
 
-        historyRepository.save(StudentProgramHistory.builder()
+        StudentProgramHistory studentProgramHistory = StudentProgramHistory.builder()
                 .student(student)
                 .program(program)
                 .action(StudentProgramHistory.ActionType.ENROLLED)
                 .timestamp(LocalDateTime.now())
-                .build());
+                .build();
+
+        historyRepository.save(studentProgramHistory);
 
 
         student.getPrograms().add(program);
