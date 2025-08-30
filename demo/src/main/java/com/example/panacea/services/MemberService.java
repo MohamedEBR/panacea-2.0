@@ -31,7 +31,7 @@ public class MemberService {
     private final ProgramRepository programRepository;
     private final StudentRepository studentRepository;
     private final StripeService stripeService;
-    private final BillingService billingService;
+//    private final BillingService billingService;
 
     public Member getMemberById(long id) {
         return memberRepository.findById(id)
@@ -62,9 +62,9 @@ public class MemberService {
         // If reactivated within first 10 days, bill immediately
         if (previous == MemberStatus.FROZEN) {
             int day = LocalDate.now().getDayOfMonth();
-            if (day <= 10) {
-                billingService.billMember(member);
-            }
+//            if (day <= 10) {
+////                billingService.billMember(member);
+//            }
         }
     }
 
@@ -147,7 +147,7 @@ public class MemberService {
             throw new StripeIntegrationException("No Stripe customer ID found for member. Cannot update payment method.", new Exception());
         }
 
-        stripeService.attachPaymentMethodToCustomer(stripeCustomerId, request.getPaymentMethodId());
+//        stripeService.attachPaymentMethodToCustomer(stripeCustomerId, request.getPaymentMethodId());
     }
 
     @Transactional
@@ -158,7 +158,7 @@ public class MemberService {
         member.setStatus(MemberStatus.CANCELLED);
         memberRepository.save(member);
 
-        stripeService.cancelCustomerSubscription(member.getStripeCustomerId());
+//        stripeService.cancelCustomerSubscription(member.getStripeCustomerId());
 
     }
 
@@ -176,10 +176,10 @@ public class MemberService {
             member.setStatus(MemberStatus.ACTIVE);
 
             int dayOfMonth = LocalDate.now().getDayOfMonth();
-            if (dayOfMonth <= 10) {
-                // immediately bill this member
-                billingService.billMember(member);
-            }
+//            if (dayOfMonth <= 10) {
+//                // immediately bill this member
+////                billingService.billMember(member);
+//            }
         }
 
         memberRepository.save(member);

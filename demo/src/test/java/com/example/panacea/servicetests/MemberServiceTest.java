@@ -6,7 +6,6 @@ import com.example.panacea.exceptions.MemberNotFoundException;
 import com.example.panacea.models.Member;
 import com.example.panacea.models.Student;
 import com.example.panacea.repo.MemberRepository;
-import com.example.panacea.services.BillingService;
 import com.example.panacea.services.MemberService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -26,8 +25,7 @@ class MemberServiceTest {
     @Mock
     private MemberRepository memberRepository;
 
-    @Mock
-    private BillingService billingService;
+
 
     @InjectMocks
     private MemberService memberService;
@@ -69,7 +67,6 @@ class MemberServiceTest {
         member.setStatus(MemberStatus.FROZEN);
         when(memberRepository.findById(4L)).thenReturn(Optional.of(member));
 
-        lenient().doNothing().when(billingService).billMember(member); // lenient resolved stubbing issue
 
         memberService.unfreezeMember(4L);
         assertEquals(MemberStatus.ACTIVE, member.getStatus());

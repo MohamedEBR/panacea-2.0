@@ -13,8 +13,6 @@ import com.example.panacea.models.Program;
 import com.example.panacea.models.Student;
 import com.example.panacea.repo.MemberRepository;
 import com.example.panacea.repo.ProgramRepository;
-import com.stripe.exception.StripeException;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -36,7 +34,6 @@ public class AuthService {
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
     private final ProgramRepository programRepository;
-    private final StripeService stripeService;
 
 
     public AuthenticationResponse register(RegisterRequest request) {
@@ -99,8 +96,6 @@ public class AuthService {
 
         memberRepository.save(member);
 
-        String stripeCustomerId = stripeService.createCustomer(member);
-        member.setStripeCustomerId(stripeCustomerId);
         memberRepository.save(member);
 
         var jwtToken = jwtService.generateToken(member);

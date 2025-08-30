@@ -21,7 +21,7 @@ public class AuthenticationController {
     @PostMapping("/register")
     public ResponseEntity<AuthenticationResponse> register(
             @Valid @RequestBody RegisterRequest request
-    ) throws StripeException {
+    ) {
         return ResponseEntity.ok(service.register(request));
     }
 
