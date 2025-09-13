@@ -30,7 +30,7 @@ public class SecurityService {
     
     // Password policy constants
     private static final int MIN_PASSWORD_LENGTH = 8;
-    private static final int MAX_FAILED_ATTEMPTS = 5;
+    private static final int MAX_FAILED_ATTEMPTS = 15;
     private static final int LOCKOUT_DURATION_MINUTES = 30;
     
     private static final Pattern PASSWORD_PATTERN = Pattern.compile(
@@ -172,19 +172,20 @@ public class SecurityService {
      * Records a failed login attempt
      */
     public void recordFailedLoginAttempt(String email) {
-        FailedAttempt fa = failedAttempts.get(email);
+        String key = email == null ? null : email.trim().toLowerCase();
+        FailedAttempt fa = failedAttempts.get(key);
         if (fa == null) {
-            failedAttempts.put(email, new FailedAttempt());
+            failedAttempts.put(key, new FailedAttempt());
         } else {
             fa.increment();
         }
         
-        FailedAttempt attempt = failedAttempts.get(email);
-        logSecurityEvent("FAILED_LOGIN_ATTEMPT", email, 
+        FailedAttempt attempt = failedAttempts.get(key);
+        logSecurityEvent("FAILED_LOGIN_ATTEMPT", key, 
             "Failed login attempt #" + attempt.getCount());
         
         if (attempt.isLocked()) {
-            logSecurityEvent("ACCOUNT_LOCKED", email, 
+            logSecurityEvent("ACCOUNT_LOCKED", key, 
                 "Account locked due to excessive failed login attempts");
         }
     }
@@ -193,15 +194,17 @@ public class SecurityService {
      * Clears failed login attempts after successful login
      */
     public void clearFailedLoginAttempts(String email) {
-        failedAttempts.remove(email);
-        logSecurityEvent("SUCCESSFUL_LOGIN", email, "Failed login attempts cleared");
+        String key = email == null ? null : email.trim().toLowerCase();
+        failedAttempts.remove(key);
+        logSecurityEvent("SUCCESSFUL_LOGIN", key, "Failed login attempts cleared");
     }
     
     /**
      * Checks if account is locked due to failed login attempts
      */
     public boolean isAccountLocked(String email) {
-        FailedAttempt attempt = failedAttempts.get(email);
+        String key = email == null ? null : email.trim().toLowerCase();
+        FailedAttempt attempt = failedAttempts.get(key);
         return attempt != null && attempt.isLocked();
     }
     
@@ -381,29 +384,31 @@ public class SecurityService {
      * Records a failed login attempt
      */
     public void recordFailedAttempt(String email) {
-        FailedAttempt attempt = failedAttempts.get(email);
+        String key = email == null ? null : email.trim().toLowerCase();
+        FailedAttempt attempt = failedAttempts.get(key);
         if (attempt == null) {
-            failedAttempts.put(email, new FailedAttempt());
+            failedAttempts.put(key, new FailedAttempt());
         } else {
             attempt.increment();
         }
         
         // Also update the legacy tracking
-        failedLoginAttempts.merge(email, 1, Integer::sum);
+        failedLoginAttempts.merge(key, 1, Integer::sum);
         
-        logSecurityEvent("FAILED_LOGIN_ATTEMPT", email, 
-            "Failed login attempt #" + failedAttempts.get(email).getCount());
+        logSecurityEvent("FAILED_LOGIN_ATTEMPT", key, 
+            "Failed login attempt #" + failedAttempts.get(key).getCount());
     }
     
     /**
      * Resets failed login attempts after successful authentication
      */
     public void resetFailedAttempts(String email) {
-        failedAttempts.remove(email);
-        failedLoginAttempts.remove(email);
-        accountLockoutTime.remove(email);
+        String key = email == null ? null : email.trim().toLowerCase();
+        failedAttempts.remove(key);
+        failedLoginAttempts.remove(key);
+        accountLockoutTime.remove(key);
         
-        logSecurityEvent("FAILED_ATTEMPTS_RESET", email, "Failed attempts reset after successful login");
+        logSecurityEvent("FAILED_ATTEMPTS_RESET", key, "Failed attempts reset after successful login");
     }
     
     /**
@@ -441,9 +446,10 @@ public class SecurityService {
      * Unlocks a user account
      */
     public void unlockAccount(String email) {
-        failedLoginAttempts.remove(email);
-        accountLockoutTime.remove(email);
-        failedAttempts.remove(email);
-        logSecurityEvent("ACCOUNT_UNLOCKED", email, "Account manually unlocked by admin");
+        String key = email == null ? null : email.trim().toLowerCase();
+        failedLoginAttempts.remove(key);
+        accountLockoutTime.remove(key);
+        failedAttempts.remove(key);
+        logSecurityEvent("ACCOUNT_UNLOCKED", key, "Account manually unlocked by admin");
     }
 }

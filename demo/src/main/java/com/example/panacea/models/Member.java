@@ -33,6 +33,7 @@ public class Member implements UserDetails {
     private LocalDate dob;  // Changed from age to dob
     private String phone;
     private String address;
+    private String unit;
     private String city;
     private String postalCode;
     private String history;  // Fixed capitalization

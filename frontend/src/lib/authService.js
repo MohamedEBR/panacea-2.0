@@ -55,11 +55,12 @@ class AuthService {
       
       if (response.data && response.data.token) {
         this.setToken(response.data.token);
-        // Decode JWT to get user info (you could also get this from the response)
         const user = {
+          id: response.data.id,
           email: response.data.email || email,
           name: response.data.name || '',
-          role: response.data.role || 'USER'
+          lastName: response.data.lastName || '',
+          role: response.data.role || 'USER',
         };
         this.setUser(user);
         return { success: true, user, token: response.data.token };
@@ -83,9 +84,11 @@ class AuthService {
       if (response.data && response.data.token) {
         this.setToken(response.data.token);
         const user = {
-          email: userData.email,
-          name: userData.name || '',
-          role: response.data.role || 'USER'
+          id: response.data.id,
+          email: response.data.email || userData.email,
+          name: response.data.name || userData.name || '',
+          lastName: response.data.lastName || userData.lastName || '',
+          role: response.data.role || 'USER',
         };
         this.setUser(user);
         return { success: true, user, token: response.data.token };

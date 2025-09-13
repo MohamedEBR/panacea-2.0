@@ -41,6 +41,9 @@ public class RegisterRequest {
     @NotBlank(message = "Address is required")
     private String address;
 
+    // Optional apartment/suite/unit number
+    private String unit;
+
     @NotBlank(message = "City is required")
     private String city;
 
@@ -80,7 +83,7 @@ public class RegisterRequest {
         @NotBlank(message = "Belt is required")
         private String belt;
 
-        @NotEmpty(message = "At least one program ID is required")
+        @Size(min = 1, max = 1, message = "Exactly one program must be selected")
         private List<Long> programIds;
     }
 }

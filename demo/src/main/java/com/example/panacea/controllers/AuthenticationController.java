@@ -23,35 +23,33 @@ public class AuthenticationController {
     public ResponseEntity<?> register(
             @Valid @RequestBody RegisterRequest request
     ) {
-        try {
-            // Validate input for XSS
-            if (!securityService.sanitizeInput(request.getEmail()).equals(request.getEmail()) ||
-                !securityService.sanitizeInput(request.getName()).equals(request.getName()) ||
-                !securityService.sanitizeInput(request.getLastName()).equals(request.getLastName())) {
-                securityService.logSecurityEvent("XSS_ATTEMPT_REGISTER", request.getEmail(), 
-                    "Attempted XSS in registration data");
-                return ResponseEntity.badRequest().body("Invalid input detected");
-            }
-            
-            // Validate email format
-            if (!securityService.isValidEmail(request.getEmail())) {
-                return ResponseEntity.badRequest().body("Invalid email format");
-            }
-            
-            // Validate password complexity
-            if (!securityService.isValidPassword(request.getPassword())) {
-                return ResponseEntity.badRequest().body(securityService.getPasswordPolicyMessage());
-            }
-            
-            AuthenticationResponse response = service.register(request);
-            securityService.logSecurityEvent("USER_REGISTERED", request.getEmail(), "New user registered");
-            return ResponseEntity.ok(response);
-            
-        } catch (Exception e) {
-            securityService.logSecurityEvent("REGISTRATION_ERROR", request.getEmail(), 
-                "Registration failed: " + e.getMessage());
-            return ResponseEntity.badRequest().body("Registration failed: " + e.getMessage());
+        // Normalize common inputs (trim whitespace)
+        if (request.getEmail() != null) request.setEmail(request.getEmail().trim());
+        if (request.getName() != null) request.setName(request.getName().trim());
+        if (request.getLastName() != null) request.setLastName(request.getLastName().trim());
+
+        // Validate input for XSS
+        if (!securityService.sanitizeInput(request.getEmail()).equals(request.getEmail()) ||
+            !securityService.sanitizeInput(request.getName()).equals(request.getName()) ||
+            !securityService.sanitizeInput(request.getLastName()).equals(request.getLastName())) {
+            securityService.logSecurityEvent("XSS_ATTEMPT_REGISTER", request.getEmail(),
+                "Attempted XSS in registration data");
+            return ResponseEntity.badRequest().body("Invalid input detected");
         }
+
+        // Validate email format
+        if (!securityService.isValidEmail(request.getEmail())) {
+            return ResponseEntity.badRequest().body("Invalid email format");
+        }
+
+        // Validate password complexity
+        if (!securityService.isValidPassword(request.getPassword())) {
+            return ResponseEntity.badRequest().body(securityService.getPasswordPolicyMessage());
+        }
+
+        AuthenticationResponse response = service.register(request);
+        securityService.logSecurityEvent("USER_REGISTERED", request.getEmail(), "New user registered");
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/authenticate")
@@ -59,6 +57,10 @@ public class AuthenticationController {
             @RequestBody AuthenticationRequest request
     ) {
         try {
+            // Normalize email (trim only to avoid case-sensitivity issues in DB lookups)
+            if (request.getEmail() != null) {
+                request.setEmail(request.getEmail().trim());
+            }
             // Check if account is locked
             if (securityService.isAccountLocked(request.getEmail())) {
                 securityService.logSecurityEvent("LOCKED_ACCOUNT_ACCESS", request.getEmail(), 

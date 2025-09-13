@@ -23,7 +23,7 @@ import { useAuth } from "../../contexts/AuthContext";
 import images from "../../constants/images";
 import { Link, useNavigate } from "react-router-dom";
 
-const navItems = ["Home", "About", "Programs", "Blogs", "Contact"];
+const navItems = ["Home", "About", "Programs", "Blogs", "Contact"]; 
 const drawerWidth = 300;
 
 const returnNavItem = (item) => {
@@ -84,7 +84,8 @@ function Header(props) {
   const getAuthMenuItems = () => {
     if (isAuthenticated()) {
       return [
-        ...(isAdmin() ? ["Create Blog"] : []),
+        "Dashboard",
+        ...(isAdmin() ? ["Create Blog", "Admin"] : []),
         "Logout"
       ];
     }
@@ -99,8 +100,14 @@ function Header(props) {
       case "Signup":
         navigate('/signup');
         break;
+      case "Dashboard":
+        navigate('/dashboard');
+        break;
       case "Create Blog":
         navigate('/blogs/new');
+        break;
+      case "Admin":
+        navigate('/admin/security');
         break;
       case "Logout":
         logout().then(() => navigate('/'));
@@ -355,6 +362,7 @@ function Header(props) {
                         </Typography>
                       </MenuItem>
                       <Divider />
+                      <MenuItem onClick={() => { handleMenuClose(); navigate('/dashboard'); }}>Dashboard</MenuItem>
                       {isAdmin() && (
                         <MenuItem onClick={() => { handleMenuClose(); navigate('/blogs/new'); }}>
                           Create Blog

@@ -35,7 +35,7 @@ public class StripeWebhookService {
 
             for (Student student : member.getStudents()) {
                 if (student.getPrograms() == null || student.getPrograms().isEmpty()) continue;
-
+                // Activate students once payment completes
                 student.setStatus(StudentStatus.ACTIVE);
                 billedStudents.add(student);
 
@@ -53,6 +53,7 @@ public class StripeWebhookService {
                     .build();
 
             billingRecordRepository.save(record);
+            memberRepository.save(member);
         }
     }
 }

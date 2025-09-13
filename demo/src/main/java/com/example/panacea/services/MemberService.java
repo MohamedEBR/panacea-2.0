@@ -4,9 +4,11 @@ import com.example.panacea.dto.UpdateMemberInfoRequest;
 import com.example.panacea.dto.UpdatePasswordRequest;
 import com.example.panacea.dto.UpdatePaymentMethodRequest;
 import com.example.panacea.dto.UpdateStudentsRequest;
+import com.example.panacea.dto.CreateStudentRequest;
 import com.example.panacea.enums.Belt;
 import com.example.panacea.enums.Gender;
 import com.example.panacea.enums.MemberStatus;
+import com.example.panacea.enums.StudentStatus;
 import com.example.panacea.exceptions.*;
 import com.example.panacea.models.Member;
 import com.example.panacea.models.Program;
@@ -20,6 +22,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.time.LocalDate;
 
 @Service
 @RequiredArgsConstructor
@@ -46,6 +49,34 @@ public class MemberService {
                 .orElseThrow(() -> new MemberNotFoundException("Member not found with id: " + memberId));
 
         return member.getStudents();
+    }
+
+    @Transactional
+    public Student createStudent(long memberId, CreateStudentRequest request) {
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new MemberNotFoundException("Member not found with id: " + memberId));
+
+        Student student = new Student();
+        student.setName(request.getName());
+        student.setDob(request.getDob());
+        student.setWeight(request.getWeight() != null ? request.getWeight() : 0);
+        student.setHeight(request.getHeight() != null ? request.getHeight() : 0);
+        student.setMedicalConcerns(request.getMedicalConcerns());
+        if (request.getGender() != null) {
+            student.setGender(Gender.valueOf(request.getGender().toUpperCase()));
+        }
+        if (request.getBelt() != null) {
+            student.setBelt(Belt.valueOf(request.getBelt().toUpperCase()));
+        }
+        student.setMember(member);
+    student.setRegisteredAt(LocalDate.now());
+    student.setStatus(StudentStatus.ACTIVE);
+
+        Student saved = studentRepository.save(student);
+
+        // Update member status based on new student
+        updateMemberStatus(member);
+        return saved;
     }
 
     @Transactional

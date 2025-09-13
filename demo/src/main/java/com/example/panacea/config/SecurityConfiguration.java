@@ -13,6 +13,11 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.security.web.header.writers.ContentSecurityPolicyHeaderWriter;
 import org.springframework.security.web.header.writers.frameoptions.XFrameOptionsHeaderWriter;
 import org.springframework.security.web.header.writers.StaticHeadersWriter;
+import org.springframework.security.config.Customizer;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.http.HttpMethod;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,6 +38,7 @@ public class SecurityConfiguration {
         logger.info("Configuring security headers...");
         http
                 .csrf(csrf -> csrf.disable())
+        .cors(Customizer.withDefaults())
                 .headers(headers -> {
                     // Configure headers - disable XSS protection first, then add our custom one
                     headers.xssProtection(xss -> xss.disable());
@@ -48,11 +54,15 @@ public class SecurityConfiguration {
                 .authorizeHttpRequests(auth -> auth
                         // Public auth endpoints
                         .requestMatchers("/api/v1/auth/**").permitAll()
+            // Preflight
+            .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         // Stripe webhook endpoint (needs signature verification instead of JWT)
                         .requestMatchers("/api/stripe/webhook").permitAll()
                         // Blog endpoints - public read access, admin write access
-                        .requestMatchers("/api/blogs", "/api/blogs/*", "/api/blogs/search").permitAll()
+                        .requestMatchers("/api/blogs", "/api/blogs/*", "/api/blogs/search", "/api/blogs/**").permitAll()
                         .requestMatchers("/api/blogs/admin/**").hasRole("SUPER_USER")
+            // Programs - public read access for signup flow
+            .requestMatchers("/api/v1/programs/**").permitAll()
                         // Admin-only endpoints
                         .requestMatchers("/api/v1/admin/**").hasRole("SUPER_USER")
                         // Member endpoints - users can only access their own data
@@ -73,5 +83,25 @@ public class SecurityConfiguration {
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
+    }
+
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.addAllowedOrigin("http://localhost:5173");
+        configuration.addAllowedOrigin("http://localhost:3000");
+        configuration.addAllowedHeader("*");
+        configuration.addExposedHeader("Authorization");
+        configuration.addAllowedMethod("GET");
+        configuration.addAllowedMethod("POST");
+        configuration.addAllowedMethod("PUT");
+        configuration.addAllowedMethod("DELETE");
+        configuration.addAllowedMethod("OPTIONS");
+        configuration.addAllowedMethod("PATCH");
+        configuration.setAllowCredentials(true);
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
     }
 }

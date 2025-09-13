@@ -10,6 +10,7 @@ import java.util.Optional;
 public interface MemberRepository extends JpaRepository<Member, Long> {
 
     Optional<Member> findByEmail(String email);
+    Optional<Member> findByEmailIgnoreCase(String email);
     Optional<Member> findByStudents_Id(Long studentId);
 
     @Query("SELECT m FROM Member m WHERE m.status = com.example.panacea.enums.MemberStatus.ACTIVE")

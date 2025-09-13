@@ -13,22 +13,23 @@ import java.time.LocalDate;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class UpdateStudentInfoRequest {
+public class CreateStudentRequest {
 
-    @NotBlank(message = "Name is Required")
+    @NotBlank(message = "Name is required")
     private String name;
 
     @NotNull(message = "DOB is required")
     private LocalDate dob;
 
-    @NotNull(message = "weight is required")
+    @NotNull(message = "Weight is required")
     private Integer weight;
 
-    @NotNull(message = "height is required")
+    @NotNull(message = "Height is required")
     private Integer height;
 
-    private String medicalConcerns;
+    private String medicalConcerns; // optional
 
-
-
+    // Optional fields; if provided will be mapped to enums
+    private String gender;
+    private String belt;
 }

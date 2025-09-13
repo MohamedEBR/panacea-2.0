@@ -4,6 +4,7 @@ import com.example.panacea.dto.UpdateMemberInfoRequest;
 import com.example.panacea.dto.UpdatePasswordRequest;
 import com.example.panacea.dto.UpdateStudentsRequest;
 import com.example.panacea.dto.UpdatePaymentMethodRequest;
+import com.example.panacea.dto.CreateStudentRequest;
 import com.example.panacea.models.Member;
 import com.example.panacea.models.Student;
 import com.example.panacea.services.MemberService;
@@ -36,6 +37,16 @@ public class MemberController {
         dataOwnershipService.validateMemberAccess(id);
         List<Student> students = service.getMemberStudents(id);
         return ResponseEntity.ok(students);
+    }
+
+    @PostMapping("/{id}/students")
+    public ResponseEntity<Student> createStudent(
+            @PathVariable Long id,
+            @RequestBody CreateStudentRequest request
+    ) {
+        dataOwnershipService.validateMemberAccess(id);
+        Student created = service.createStudent(id, request);
+        return ResponseEntity.ok(created);
     }
 
 
