@@ -41,25 +41,33 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         jwtToken = authorizationHeader.substring(7);
-        userEmail = jwtService.extractUsername(jwtToken);
+        
+        try {
+            userEmail = jwtService.extractUsername(jwtToken);
 
-        if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
+            if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
 
-            if(jwtService.isTokenValid(jwtToken, userDetails)) {
-                UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                        userDetails,
-                        null,
-                        userDetails.getAuthorities()
-                );
+                if(jwtService.isTokenValid(jwtToken, userDetails)) {
+                    UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
+                            userDetails,
+                            null,
+                            userDetails.getAuthorities()
+                    );
 
-                authToken.setDetails(
-                        new WebAuthenticationDetailsSource().buildDetails(request)
-                );
+                    authToken.setDetails(
+                            new WebAuthenticationDetailsSource().buildDetails(request)
+                    );
 
-                SecurityContextHolder.getContext().setAuthentication(authToken);
+                    SecurityContextHolder.getContext().setAuthentication(authToken);
+                }
             }
+        } catch (Exception e) {
+            // JWT parsing failed - invalid or malformed token
+            // Let the request continue without setting authentication
+            // Spring Security will handle the unauthorized response
         }
+        
         filterChain.doFilter(request, response);
     }
 }

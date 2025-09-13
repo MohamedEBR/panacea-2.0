@@ -38,6 +38,10 @@ public class MemberService {
                 .orElseThrow(() -> new MemberNotFoundException("Member not found with id: " + id));
     }
 
+    public List<Member> getAllMembers() {
+        return memberRepository.findAll();
+    }
+
     public List<Student> getMemberStudents(long memberId) {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new MemberNotFoundException("Member not found with id: " + memberId));

@@ -29,8 +29,9 @@ public class PasswordService {
     private final MemberRepository memberRepository;
     private final PasswordResetTokenRepository tokenRepository;
     private final RevokedTokenRepository revokedRepository;
-    private final PasswordEncoder passwordEncoder;
     private final JavaMailSender mailSender;
+    private final PasswordEncoder passwordEncoder;
+    private final SecurityService securityService;
 
     @Value("${app.frontend.reset-password-url}")
     private String resetPasswordUrl;
@@ -80,9 +81,28 @@ public class PasswordService {
             throw new PasswordMismatchException("Passwords do not match");
         }
 
+        // Validate password using SecurityService
+        if (!securityService.isValidPassword(request.getNewPassword())) {
+            throw new IllegalArgumentException(securityService.getPasswordPolicyMessage());
+        }
+
         Member member = prt.getMember();
-        member.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        
+        // Check password history
+        if (securityService.isPasswordInHistory(member.getEmail(), request.getNewPassword())) {
+            throw new IllegalArgumentException("Password was recently used. Please choose a different password.");
+        }
+        
+        String encodedPassword = passwordEncoder.encode(request.getNewPassword());
+        member.setPassword(encodedPassword);
         memberRepository.save(member);
+
+        // Update password history
+        securityService.addToPasswordHistory(member.getEmail(), encodedPassword);
+        
+        // Log security event
+        securityService.logSecurityEvent("PASSWORD_RESET", member.getEmail(), 
+            "Password successfully reset using token");
 
         // Clean up token
         tokenRepository.delete(prt);

@@ -5,6 +5,7 @@ import com.example.panacea.enums.StudentStatus;
 import com.example.panacea.models.*;
 import com.example.panacea.repo.*;
 import com.stripe.Stripe;
+import com.stripe.exception.StripeException;
 import com.stripe.model.checkout.Session;
 import com.stripe.param.checkout.SessionCreateParams;
 import jakarta.annotation.PostConstruct;
@@ -12,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.*;
 
 @Service
@@ -80,5 +82,32 @@ public class StripeService {
         } catch (Exception e) {
             throw new RuntimeException("Stripe session creation failed: " + e.getMessage());
         }
+    }
+
+    public Session createStripeSession(Member member, BigDecimal amount) throws StripeException {
+        SessionCreateParams params = SessionCreateParams.builder()
+                .setCustomer(member.getStripeCustomerId())
+                .addLineItem(
+                        SessionCreateParams.LineItem.builder()
+                                .setQuantity(1L)
+                                .setPriceData(
+                                        SessionCreateParams.LineItem.PriceData.builder()
+                                                .setCurrency("usd")
+                                                .setUnitAmount(amount.multiply(BigDecimal.valueOf(100)).longValue())
+                                                .setProductData(
+                                                        SessionCreateParams.LineItem.PriceData.ProductData.builder()
+                                                                .setName("Monthly Subscription")
+                                                                .build()
+                                                )
+                                                .build()
+                                )
+                                .build()
+                )
+                .setMode(SessionCreateParams.Mode.PAYMENT)
+                .setSuccessUrl("https://example.com/success")
+                .setCancelUrl("https://example.com/cancel")
+                .build();
+
+        return Session.create(params);
     }
 }

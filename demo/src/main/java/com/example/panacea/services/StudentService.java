@@ -15,6 +15,8 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Period;
@@ -30,6 +32,10 @@ public class StudentService {
     public Student getStudentById(Long id) {
         return studentRepository.findById(id)
                 .orElseThrow(() -> new StudentNotFoundException("Student not found with id: " + id));
+    }
+
+    public List<Student> getAllStudents() {
+        return studentRepository.findAll();
     }
 
     @Transactional
