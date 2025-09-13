@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -18,6 +19,7 @@ import org.slf4j.LoggerFactory;
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity(prePostEnabled = true)
 @RequiredArgsConstructor
 public class SecurityConfiguration {
 
@@ -48,6 +50,9 @@ public class SecurityConfiguration {
                         .requestMatchers("/api/v1/auth/**").permitAll()
                         // Stripe webhook endpoint (needs signature verification instead of JWT)
                         .requestMatchers("/api/stripe/webhook").permitAll()
+                        // Blog endpoints - public read access, admin write access
+                        .requestMatchers("/api/blogs", "/api/blogs/*", "/api/blogs/search").permitAll()
+                        .requestMatchers("/api/blogs/admin/**").hasRole("SUPER_USER")
                         // Admin-only endpoints
                         .requestMatchers("/api/v1/admin/**").hasRole("SUPER_USER")
                         // Member endpoints - users can only access their own data

@@ -1,13 +1,10 @@
 package com.example.panacea.dto;
 
-import com.example.panacea.models.Program;
-import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.util.List;
 
 @Data
 @Builder
@@ -15,7 +12,7 @@ import java.util.List;
 @AllArgsConstructor
 public class AddStudentProgramRequest {
 
-    @NotEmpty(message = "A program id is required")
+    @NotNull(message = "A program id is required")
     private Long programId;
 
 }

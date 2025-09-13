@@ -40,15 +40,29 @@ public class JwtService {
             Map<String, Object> extraClaims,
             UserDetails userDetails
     ) {
-        return Jwts
-                .builder()
-                .claim("sub", userDetails.getUsername())
-                .claim("iss", ISSUER)
-                .claim("aud", AUDIENCE)
-                .claim("iat", new Date(System.currentTimeMillis()))
-                .claim("exp", new Date(System.currentTimeMillis() + 1000 * 60 * 15)) // 15 minutes expiration
-                .signWith(getSignInKey())
-                .compact();
+    Date now = new Date();
+    Date expiry = new Date(now.getTime() + 1000 * 60 * 15); // 15 minutes expiration
+
+    // Build JWT using typed registered claim setters for correctness
+    io.jsonwebtoken.JwtBuilder builder = Jwts
+        .builder()
+        .subject(userDetails.getUsername())
+        .issuer(ISSUER)
+        // JJWT 0.12+ supports multiple audiences; use sub-builder safely
+        .audience().add(AUDIENCE).and()
+        .issuedAt(now)
+        .expiration(expiry);
+
+    // Apply any extra custom claims, if provided
+    if (extraClaims != null && !extraClaims.isEmpty()) {
+        for (Map.Entry<String, Object> entry : extraClaims.entrySet()) {
+        builder.claim(entry.getKey(), entry.getValue());
+        }
+    }
+
+    return builder
+        .signWith(getSignInKey())
+        .compact();
     }
 
     public boolean isTokenValid(String token, UserDetails userDetails) {
@@ -97,6 +111,9 @@ public class JwtService {
     }
 
     private SecretKey getSignInKey() {
+        if (JWT_SECRET == null || JWT_SECRET.isBlank()) {
+            throw new IllegalStateException("JWT_SECRET is not configured in environment variables");
+        }
         byte[] keyBytes = Base64.getDecoder().decode(JWT_SECRET);
         return Keys.hmacShaKeyFor(keyBytes);
     }

@@ -90,6 +90,7 @@ public class SecurityService {
         }
         
         public int getCount() { return count; }
+        @SuppressWarnings("unused")
         public LocalDateTime getLastAttempt() { return lastAttempt; }
     }
     
@@ -171,14 +172,12 @@ public class SecurityService {
      * Records a failed login attempt
      */
     public void recordFailedLoginAttempt(String email) {
-        failedAttempts.compute(email, (key, attempt) -> {
-            if (attempt == null) {
-                return new FailedAttempt();
-            } else {
-                attempt.increment();
-                return attempt;
-            }
-        });
+        FailedAttempt fa = failedAttempts.get(email);
+        if (fa == null) {
+            failedAttempts.put(email, new FailedAttempt());
+        } else {
+            fa.increment();
+        }
         
         FailedAttempt attempt = failedAttempts.get(email);
         logSecurityEvent("FAILED_LOGIN_ATTEMPT", email, 
@@ -241,14 +240,15 @@ public class SecurityService {
      */
     public void addPasswordToHistory(String email, String password) {
         String hashedPassword = hashPassword(password);
-        passwordHistory.computeIfAbsent(email, k -> new HashSet<>()).add(hashedPassword);
+        passwordHistory.putIfAbsent(email, new HashSet<>());
+        passwordHistory.get(email).add(hashedPassword);
         
         // Keep only last 5 passwords in history
         Set<String> history = passwordHistory.get(email);
         if (history.size() > 5) {
             // Remove oldest password (simplified - in production use proper ordering)
-            history.iterator().next();
-            history.remove(history.iterator().next());
+            String oldest = history.iterator().next();
+            history.remove(oldest);
         }
     }
     
@@ -381,14 +381,12 @@ public class SecurityService {
      * Records a failed login attempt
      */
     public void recordFailedAttempt(String email) {
-        failedAttempts.compute(email, (key, attempt) -> {
-            if (attempt == null) {
-                return new FailedAttempt();
-            } else {
-                attempt.increment();
-                return attempt;
-            }
-        });
+        FailedAttempt attempt = failedAttempts.get(email);
+        if (attempt == null) {
+            failedAttempts.put(email, new FailedAttempt());
+        } else {
+            attempt.increment();
+        }
         
         // Also update the legacy tracking
         failedLoginAttempts.merge(email, 1, Integer::sum);
@@ -425,7 +423,8 @@ public class SecurityService {
      * Adds password to history after successful change
      */
     public void addToPasswordHistory(String email, String hashedPassword) {
-        passwordHistory.computeIfAbsent(email, k -> new HashSet<>()).add(hashedPassword);
+        passwordHistory.putIfAbsent(email, new HashSet<>());
+        passwordHistory.get(email).add(hashedPassword);
         
         // Keep only last 5 passwords
         Set<String> history = passwordHistory.get(email);

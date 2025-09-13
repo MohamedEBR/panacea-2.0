@@ -4,12 +4,10 @@ import com.example.panacea.dto.*;
 import com.example.panacea.services.AuthService;
 import com.example.panacea.services.PasswordService;
 import com.example.panacea.services.SecurityService;
-import com.stripe.exception.StripeException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController

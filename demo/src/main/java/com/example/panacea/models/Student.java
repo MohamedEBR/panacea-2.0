@@ -27,7 +27,6 @@ public class Student {
 
     private String name;
 
-    @Temporal(TemporalType.DATE)
     private LocalDate dob;
 
     private int weight;
@@ -44,7 +43,6 @@ public class Student {
     private StudentStatus status;
 
     private LocalDate registeredAt;
-    private int yearsInClub;
 
     @ManyToOne
     @JoinColumn(name = "member_id")

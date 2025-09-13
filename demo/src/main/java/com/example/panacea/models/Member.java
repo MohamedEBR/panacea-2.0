@@ -49,6 +49,7 @@ public class Member implements UserDetails {
     private List<Student> students;
 
     @OneToMany(mappedBy="member", cascade=CascadeType.ALL)
+    @Builder.Default
     private List<BillingRecord> billingHistory = new ArrayList<>();
 
     @Override

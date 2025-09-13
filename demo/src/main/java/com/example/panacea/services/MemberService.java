@@ -19,7 +19,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -30,7 +29,7 @@ public class MemberService {
     private final PasswordEncoder passwordEncoder;
     private final ProgramRepository programRepository;
     private final StudentRepository studentRepository;
-    private final StripeService stripeService;
+//    private final StripeService stripeService;
 //    private final BillingService billingService;
 
     public Member getMemberById(long id) {
@@ -59,17 +58,10 @@ public class MemberService {
     @Transactional
     public void unfreezeMember(Long id) {
         Member member = getMemberById(id);
-        MemberStatus previous = member.getStatus();
         member.setStatus(MemberStatus.ACTIVE);
         memberRepository.save(member);
 
-        // If reactivated within first 10 days, bill immediately
-        if (previous == MemberStatus.FROZEN) {
-            int day = LocalDate.now().getDayOfMonth();
-//            if (day <= 10) {
-////                billingService.billMember(member);
-//            }
-        }
+    // If reactivated within first 10 days, bill immediately (feature deferred)
     }
 
     public void updateMemberInfo(long id, UpdateMemberInfoRequest request) {
@@ -129,7 +121,6 @@ public class MemberService {
             student.setMedicalConcerns(s.getMedicalConcerns());
             student.setGender(Gender.valueOf(s.getGender().toUpperCase()));
             student.setBelt(Belt.valueOf(s.getBelt().toUpperCase()));
-            student.setYearsInClub(s.getYearsInClub());
             student.setPrograms(programs);
             student.setMember(member);
 
@@ -167,7 +158,7 @@ public class MemberService {
     }
 
     public void updateMemberStatus(Member member) {
-        MemberStatus previous = member.getStatus();
+    MemberStatus previous = member.getStatus();
         boolean hasStudents = member.getStudents() != null && !member.getStudents().isEmpty();
 
         if (hasStudents && previous == MemberStatus.SUSPENDED) {
@@ -179,11 +170,7 @@ public class MemberService {
         else if (previous == MemberStatus.FROZEN && hasStudents) {
             member.setStatus(MemberStatus.ACTIVE);
 
-            int dayOfMonth = LocalDate.now().getDayOfMonth();
-//            if (dayOfMonth <= 10) {
-//                // immediately bill this member
-////                billingService.billMember(member);
-//            }
+            // Billing logic can be added here if needed
         }
 
         memberRepository.save(member);
