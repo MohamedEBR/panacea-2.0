@@ -23,45 +23,43 @@ export default function Footer() {
         </div>
 
         <div>
-          <a href="" className="me-4 text-dark">
-            <MDBBtn
-              floating
-              className="m-1"
-              rippleColor="light"
-              color="light"
-              size="lg"
-              href="https://www.facebook.com/people/Panacea-International-Karate-Academy/100069371208804/"
-              role="button"
-            >
-              <MDBIcon fab icon="facebook-f" />
-            </MDBBtn>
-          </a>
-          <a href="" className="me-4 text-dark">
-            <MDBBtn
-              floating
-              className="m-1"
-              rippleColor="light"
-              color="light"
-              size="lg"
-              href="https://www.google.com/search?q=pancea+karate+acdemy+google&sca_esv=442f0bb1f3fffd8e&sxsrf=ADLYWIIymdIZaOklsGjiEbqtsdmvZJNkBQ%3A1717176374158&source=hp&ei=NghaZpi4B5j10PEPnNKO8AY&iflsig=AL9hbdgAAAAAZloWRqTyp9eahJBmy7apnyqnELLdypBF&ved=0ahUKEwiYq6--tLiGAxWYOjQIHRypA24Q4dUDCA8&uact=5&oq=pancea+karate+acdemy+google&gs_lp=Egdnd3Mtd2l6IhtwYW5jZWEga2FyYXRlIGFjZGVteSBnb29nbGUyBxAhGKABGAoyBxAhGKABGApIvwtQkAVYkAVwAXgAkAEAmAFyoAFyqgEDMC4xuAEDyAEA-AEC-AEBmAICoAKEAagCCsICBxAjGOoCGCeYAwiSBwMxLjGgB5cE&sclient=gws-wiz"
-              role="button"
-            >
-              <MDBIcon fab icon="google" />
-            </MDBBtn>{" "}
-          </a>
-          <a href="" className="me-4 text-dark">
-            <MDBBtn
-              floating
-              className="m-1"
-              rippleColor="light"
-              color="light"
-              size="lg"
-              href="#!"
-              role="button"
-            >
-              <MDBIcon fab icon="instagram" />
-            </MDBBtn>{" "}
-          </a>
+          <MDBBtn
+            floating
+            className="m-1 me-4"
+            rippleColor="light"
+            color="light"
+            size="lg"
+            href="https://www.facebook.com/people/Panacea-International-Karate-Academy/100069371208804/"
+            role="button"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <MDBIcon fab icon="facebook-f" />
+          </MDBBtn>
+          <MDBBtn
+            floating
+            className="m-1 me-4"
+            rippleColor="light"
+            color="light"
+            size="lg"
+            href="https://www.google.com/search?q=pancea+karate+acdemy+google"
+            role="button"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <MDBIcon fab icon="google" />
+          </MDBBtn>
+          <MDBBtn
+            floating
+            className="m-1 me-4"
+            rippleColor="light"
+            color="light"
+            size="lg"
+            href="#!"
+            role="button"
+          >
+            <MDBIcon fab icon="instagram" />
+          </MDBBtn>
         </div>
       </section>
 
@@ -91,31 +89,23 @@ export default function Footer() {
             <MDBCol md="2" lg="2" xl="2" className="mx-auto mb-4">
               <h6 className="text-uppercase fw-bold mb-4">Links</h6>
               <p>
-                <Link to='/about' style={{color: '#fff'}}>
-                <a href="#!" className="text-reset">
+                <Link to='/about' style={{color: '#fff', textDecoration: 'none'}}>
                   About
-                </a>
                 </Link>
               </p>
               <p>
-              <Link to='/programs' style={{color: '#fff'}}>
-                <a href="#!" className="text-reset">
+                <Link to='/programs' style={{color: '#fff', textDecoration: 'none'}}>
                   Programs
-                </a>
                 </Link>
               </p>
               <p>
-                <Link to='/blogs' style={{color: '#fff'}}>
-                <a href="#!" className="text-reset">
+                <Link to='/blogs' style={{color: '#fff', textDecoration: 'none'}}>
                   Blogs
-                </a>
                 </Link>
               </p>
               <p>
-              <Link to='/contact' style={{color: '#fff'}}>
-                <a href="#!" className="text-reset">
+                <Link to='/contact' style={{color: '#fff', textDecoration: 'none'}}>
                   Contact
-                </a>
                 </Link>
               </p>
             </MDBCol>
@@ -157,8 +147,8 @@ export default function Footer() {
         style={{ backgroundColor: "rgba(0, 0, 0, 0.05)" }}
       >
         © 2024 Copyright:
-        <a className="text-reset fw-bold" href="https://panaceakarateacademy.ca/">
-        panaceakarateacademy.ca
+        <a className="text-reset fw-bold" href="https://panaceakarateacademy.ca/" target="_blank" rel="noopener noreferrer">
+          panaceakarateacademy.ca
         </a>
       </div>
     </MDBFooter>

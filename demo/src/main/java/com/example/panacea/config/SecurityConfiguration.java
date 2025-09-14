@@ -87,21 +87,28 @@ public class SecurityConfiguration {
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration configuration = new CorsConfiguration();
-        configuration.addAllowedOrigin("http://localhost:5173");
-        configuration.addAllowedOrigin("http://localhost:3000");
-        configuration.addAllowedHeader("*");
-        configuration.addExposedHeader("Authorization");
-        configuration.addAllowedMethod("GET");
-        configuration.addAllowedMethod("POST");
-        configuration.addAllowedMethod("PUT");
-        configuration.addAllowedMethod("DELETE");
-        configuration.addAllowedMethod("OPTIONS");
-        configuration.addAllowedMethod("PATCH");
-        configuration.setAllowCredentials(true);
+        CorsConfiguration cfg = new CorsConfiguration();
+        // Explicit common dev origins
+        cfg.addAllowedOrigin("http://localhost:5173");
+        cfg.addAllowedOrigin("http://localhost:3000");
+        cfg.addAllowedOrigin("http://127.0.0.1:5173");
+        cfg.addAllowedOrigin("http://127.0.0.1:3000");
+        // Also support any localhost/127.0.0.1 ports via patterns (Spring 5.3+)
+            cfg.addAllowedOriginPattern("http://localhost:*");
+            cfg.addAllowedOriginPattern("http://127.0.0.1:*");
+        // Headers/methods
+        cfg.addAllowedHeader("*");
+        cfg.addExposedHeader("Authorization");
+        cfg.addAllowedMethod("GET");
+        cfg.addAllowedMethod("POST");
+        cfg.addAllowedMethod("PUT");
+        cfg.addAllowedMethod("DELETE");
+        cfg.addAllowedMethod("OPTIONS");
+        cfg.addAllowedMethod("PATCH");
+        cfg.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration);
+        source.registerCorsConfiguration("/**", cfg);
         return source;
     }
 }

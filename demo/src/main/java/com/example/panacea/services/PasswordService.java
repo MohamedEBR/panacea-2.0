@@ -11,7 +11,8 @@ import com.example.panacea.models.RevokedToken;
 import com.example.panacea.repo.MemberRepository;
 import com.example.panacea.repo.PasswordResetTokenRepository;
 import com.example.panacea.repo.RevokedTokenRepository;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.mail.MailException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
@@ -21,10 +22,13 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Service
 @RequiredArgsConstructor
 public class PasswordService {
+    private static final Logger logger = LoggerFactory.getLogger(PasswordService.class);
 
     private final MemberRepository memberRepository;
     private final PasswordResetTokenRepository tokenRepository;
@@ -36,10 +40,11 @@ public class PasswordService {
     @Value("${app.frontend.reset-password-url}")
     private String resetPasswordUrl;
 
-    @Transactional
+    @Transactional(noRollbackFor = MailException.class)
     public void forgotPassword(ForgotPasswordRequest request) {
-        Member member = memberRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new MemberNotFoundException("No member with email: " + request.getEmail()));
+        String email = request.getEmail() == null ? null : request.getEmail().trim();
+        Member member = memberRepository.findByEmailIgnoreCase(email)
+                .orElseThrow(() -> new MemberNotFoundException("No member with email: " + email));
 
         // Remove any existing tokens for this member
         tokenRepository.deleteByMemberId(member.getId());
@@ -65,7 +70,15 @@ public class PasswordService {
                         "If you didn't request this, please ignore this email.\n\n" +
                         "Thanks,\nPanacea Karate Academy Team"
         );
-        mailSender.send(message);
+        try {
+            mailSender.send(message);
+        } catch (Exception e) {
+            // Do not fail the request if email sending has issues (e.g., SMTP misconfig)
+            securityService.logSecurityEvent("EMAIL_SEND_FAILURE", member.getEmail(),
+                    "Forgot-password email could not be sent: " + e.getMessage());
+            // Developer aid: log the link so it can be used during local testing
+            logger.info("[DEV ONLY] Password reset link for {}: {}", member.getEmail(), link);
+        }
     }
 
     @Transactional

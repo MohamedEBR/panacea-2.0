@@ -101,9 +101,19 @@ public class AuthenticationController {
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<Void> logout(@RequestHeader("Authorization") String authHeader) {
-        String token = authHeader.replace("Bearer ", "");
-        passwordService.logout(token);
+    public ResponseEntity<Void> logout(@RequestHeader(value = "Authorization", required = false) String authHeader) {
+        try {
+            if (authHeader == null || authHeader.isBlank() || !authHeader.startsWith("Bearer ")) {
+                return ResponseEntity.ok().build(); // No-op if no token
+            }
+            String token = authHeader.replace("Bearer ", "");
+            if (token == null || token.isBlank()) {
+                return ResponseEntity.ok().build();
+            }
+            passwordService.logout(token);
+        } catch (Exception ignored) {
+            // Swallow errors to avoid 500 on logout
+        }
         return ResponseEntity.ok().build();
     }
 

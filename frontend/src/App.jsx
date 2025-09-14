@@ -4,7 +4,7 @@ import ProtectedRoute from "./components/auth/ProtectedRoute";
 import Header from "./components/shared/Header";
 import Footer from "./components/shared/Footer";
 import "./App.css";
-import { Home, About, Contact, Programs, Error, Login, Signup, Blogs, CreateBlog, EditBlog, BlogId, PaymentSuccess, PaymentCancel, AdminSecurity } from "./pages";
+import { Home, About, Contact, Programs, Error, Login, Signup, Blogs, CreateBlog, EditBlog, BlogId, PaymentSuccess, PaymentCancel, AdminSecurity, ForgotPassword, ResetPassword, Billing } from "./pages";
 import Box from "@mui/material/Box";
 import MemberDashboard from './components/member/MemberDashboard';
 import MemberProfile from './components/member/MemberProfile';
@@ -54,6 +54,8 @@ function App() {
             } 
           />
           <Route path="/login" element={<Login />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/signup/success" element={<PaymentSuccess />} />
           <Route path="/signup/cancel" element={<PaymentCancel />} />
@@ -104,6 +106,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <EditStudent />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/billing" 
+            element={
+              <ProtectedRoute>
+                <Billing />
               </ProtectedRoute>
             } 
           />

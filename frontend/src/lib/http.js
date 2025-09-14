@@ -48,20 +48,46 @@ axiosInstance.interceptors.response.use(
   }
 );
 
-const http = (url, { method = 'GET', data = undefined, headers = {} } = {}) => {
-  return axiosInstance({
-    url,
-    method,
-    data,
-    headers,
-  })
+// Flexible helper supporting:
+// - http(url, { method, data, headers, params })
+// - http(url, data)
+// - http(url, data, { headers })
+const http = (url, arg1 = {}, arg2 = undefined) => {
+  // Case A: second arg is an options object (has data/method/headers)
+  if (arg1 && (arg1.data !== undefined || arg1.method !== undefined || arg1.headers !== undefined || arg1.params !== undefined)) {
+    const { method = 'GET', data = undefined, headers = {}, params = undefined } = arg1
+    return axiosInstance({ url, method, data, headers, params })
+  }
+  // Case B: second arg is the raw data body, optional third arg for options
+  const data = arg1
+  const opts = arg2 || {}
+  const method = opts.method || 'GET'
+  const headers = opts.headers || {}
+  const params = opts.params
+  return axiosInstance({ url, method, data, headers, params })
 }
 
 // Main functions to handle different types of endpoints
 const get = (url, opts = {}) => http(url, { ...opts })
-const post = (url, opts = {}) => http(url, { method: 'POST', ...opts })
-const put = (url, opts = {}) => http(url, { method: 'PUT', ...opts })
-const deleteData = (url, opts = {}) => http(url, { method: 'DELETE', ...opts })
+const post = (url, dataOrOpts = {}, maybeOpts = undefined) => {
+  // Support post(url, { data }) and post(url, data)
+  if (dataOrOpts && (dataOrOpts.data !== undefined || dataOrOpts.headers !== undefined || dataOrOpts.method !== undefined)) {
+    return http(url, { method: 'POST', ...dataOrOpts })
+  }
+  return http(url, dataOrOpts, { method: 'POST', ...(maybeOpts || {}) })
+}
+const put = (url, dataOrOpts = {}, maybeOpts = undefined) => {
+  if (dataOrOpts && (dataOrOpts.data !== undefined || dataOrOpts.headers !== undefined || dataOrOpts.method !== undefined)) {
+    return http(url, { method: 'PUT', ...dataOrOpts })
+  }
+  return http(url, dataOrOpts, { method: 'PUT', ...(maybeOpts || {}) })
+}
+const deleteData = (url, dataOrOpts = {}, maybeOpts = undefined) => {
+  if (dataOrOpts && (dataOrOpts.data !== undefined || dataOrOpts.headers !== undefined || dataOrOpts.method !== undefined)) {
+    return http(url, { method: 'DELETE', ...dataOrOpts })
+  }
+  return http(url, dataOrOpts, { method: 'DELETE', ...(maybeOpts || {}) })
+}
 
 const methods = {
   get,

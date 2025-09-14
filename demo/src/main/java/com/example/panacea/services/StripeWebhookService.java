@@ -19,6 +19,7 @@ public class StripeWebhookService {
 
     private final MemberRepository memberRepository;
     private final BillingRecordRepository billingRecordRepository;
+    private final EmailService emailService;
 
     public void handleStripeEvent(Event event) {
         if ("checkout.session.completed".equals(event.getType())) {
@@ -54,6 +55,9 @@ public class StripeWebhookService {
 
             billingRecordRepository.save(record);
             memberRepository.save(member);
+
+            // Email receipt to member (best-effort)
+            try { emailService.sendBillingReceiptEmail(member, record); } catch (Exception ignored) {}
         }
     }
 }

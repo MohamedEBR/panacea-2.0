@@ -25,20 +25,14 @@ const Blogs = () => {
     async function fetchData() {
       try {
         setLoading(true)
-        const response = await http.get('/api/v1/blogs/published')
-        
-        // Handle Spring Boot response format
-        if (response.data && Array.isArray(response.data)) {
-          setBlogs(response.data)
-        } else if (response.data && response.data.content) {
-          // Handle paginated response
-          setBlogs(response.data.content)
-        } else {
-          setBlogs([])
-        }
+        const response = await http.get('/api/v1/blogs')
+
+        // New BlogController returns { success, data: { blogs, ... } }
+        const blogs = response.data?.data?.blogs
+        setBlogs(Array.isArray(blogs) ? blogs : [])
       } catch (error) {
         console.error('Error fetching blogs:', error)
-        setError('Failed to load blogs')
+  setError('Failed to load blogs')
       } finally {
         setLoading(false)
       }

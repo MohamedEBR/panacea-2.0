@@ -36,12 +36,17 @@ public class AuthService {
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
     private final ProgramRepository programRepository;
+    private final EmailService emailService;
 
 
     public AuthenticationResponse register(RegisterRequest request) {
         // Normalize email: trim and lowercase for consistent storage and lookup
         if (request.getEmail() != null) {
             request.setEmail(request.getEmail().trim().toLowerCase());
+        }
+        // Prevent duplicate emails
+        if (memberRepository.findByEmailIgnoreCase(request.getEmail()).isPresent()) {
+            throw new EmailAlreadyExistsException("Email already in use");
         }
         List<Student> students = request.getStudents().stream().map(s -> {
             // Expect exactly one program id
@@ -83,8 +88,8 @@ public class AuthService {
             .gender(Gender.valueOf(s.getGender()))
             .belt(studentBelt)
             .registeredAt(registeredAt)
-            // Mark as FROZEN until payment completes (webhook will activate)
-            .status(StudentStatus.FROZEN)
+            // Set ACTIVE on registration per current business rule
+            .status(StudentStatus.ACTIVE)
             .build();
 
         // Set up bidirectional relation using MUTABLE lists
@@ -117,7 +122,10 @@ public class AuthService {
 
         students.forEach(student -> student.setMember(member));
 
-        memberRepository.save(member);
+    memberRepository.save(member);
+
+    // Send welcome/registration confirmation email (non-blocking best-effort)
+    try { emailService.sendWelcomeEmail(member); } catch (Exception ignored) {}
 
     var jwtToken = jwtService.generateToken(member);
     return AuthenticationResponse.builder()

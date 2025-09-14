@@ -118,7 +118,9 @@ const Login = () => {
                 control={<Checkbox checked={remember} onChange={(e)=>setRemember(e.target.checked)} />}
                 label="Remember me"
               />
-              <Typography variant="body2" color="text.secondary">{/* Reserved for forgot password */}</Typography>
+              <Typography variant="body2" color="text.secondary">
+                <Link to="/forgot-password">Forgot password?</Link>
+              </Typography>
             </Box>
             <Button type="submit" variant="contained" disabled={loading} fullWidth sx={{ mt: 2 }}>
               {loading ? 'Signing in…' : 'Sign in'}

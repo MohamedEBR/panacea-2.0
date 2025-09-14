@@ -139,15 +139,15 @@ class AuthService {
   }
 
   // Reset password
-  static async resetPassword(token, newPassword) {
+  static async resetPassword(token, newPassword, confirmPassword) {
     try {
       await http.post('/api/v1/auth/reset-password', {
-        data: { token, newPassword }
+        data: { token, newPassword, confirmPassword }
       });
       return { success: true, message: 'Password reset successfully' };
     } catch (error) {
       console.error('Reset password error:', error);
-      const message = error.response?.data?.message || 'Failed to reset password';
+      const message = error.response?.data?.message || error.response?.data || 'Failed to reset password';
       return { success: false, message };
     }
   }
