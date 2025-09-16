@@ -26,7 +26,7 @@ A full-stack membership, billing, and program management platform for martial ar
 - PostgreSQL
 
 ### Backend Setup
-1. Copy `.env.example` to `.env` and set DB, JWT, Stripe, and mail credentials.
+1. Create your own environmental variables to `.env` and set DB, JWT, Stripe, and mail credentials.
 2. Edit `src/main/resources/application.properties` as needed.
 3. Build and run:
    ```powershell
@@ -45,9 +45,6 @@ A full-stack membership, billing, and program management platform for martial ar
 ### Common Ports
 - Backend: 8080
 - Frontend: 5173
-
-## Environment Variables
-- See `.env.example` for required variables (DB, JWT, Stripe, mail).
 
 ## CORS
 - Configured for `localhost` and `127.0.0.1` on common dev ports. Adjust in `SecurityConfiguration.java` if needed.
